@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>mini Project</title>
+    <style>
+        canvas{border: 1px solid black;}
+    </style>
+</head>
+
+<body>
+    <script>
+        var enemyShips=[];
+        var numEnemies;
+        var myShots=[];
+        var w,h,ctx,myShip,sBoard;
+        var score=0.05;
+        var GameArea = {
+            canvas : document.createElement("canvas"),
+            start : function(){
+                this.canvas.width=300;
+                this.canvas.height=500;
+                this.ctx = this.canvas.getContext("2d");
+                document.body.insertBefore(this.canvas,document.body.childNodes[0]);
+            },
+            clear : function(){
+                this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+            }
+        }
+        var initialize = function(){
+            GameArea.start();
+            w = GameArea.canvas.width;
+            h = GameArea.canvas.height;
+            ctx=GameArea.ctx;
+            //score
+            sBaord=new TextObject("0.00",15,15,"white");
+            myShip=new object(w/2-15,h-40,30,30,"blue");
+            //create enemies' ships
+            numEnemies=5;
+            var j =15;
+            for(var i = 0 ; i < numEnemies ; i++){
+                enemyShips.push(new object(Math.floor(Math.random()*(w-30)),j,30,30,"black"));
+                j-=Math.floor(Math.random()*(100)+40);
+            }
+            setInterval(animate,1000/30);
+        }
+        //on click space release fire
+        document.onkeydown = function(e){
+            var key=e.keyCode;
+            if(key==32){
+                if(myShots.length<4)
+               myShots.push(new object(myShip.x+myShip.width/2,myShip.y,6,20,"yellow"));
+            }
+        }
+         
+        
+        //update ship move
+        
+        //update game move
+        var animate = function(){
+            GameArea.clear();
+            myShip.update();
+            score+=0.16;
+            sBaord.string=Math.round(score);
+            sBaord.up();
+            //update shots position
+            for(var i=0;i<myShots.length;i++){
+                myShots[i].y-=3;
+                myShots[i].update();
+                if(myShots[i].y<0){
+                    myShots.splice(i,1);
+                    i--;
+                }
+            }
+            //update enemies position
+            for(var i = 0;i<numEnemies;i++){
+                var e = enemyShips[i];
+                e.y+=2;
+                e.update();
+                //if ship crashes >> lost
+                //else if ship move out line >> update score & del the enemyship
+                //else if ship shot >> update score & del the enemyShip
+                if((e.y+e.height>myShip.y)&&((e.x>myShip.x&&e.x<myShip.x+myShip.width)||(e.x+e.width>myShip.x&&e.x+e.width<myShip.x+myShip.width))){
+                    //lost
+                    alert("your score is " + Math.round(score));
+                }
+                else if(e.y>GameArea.canvas.height){
+                    score-=100;
+                    enemyShips.splice(i,1);
+                }
+                if(enemyShips.length==0){
+                        alert("your score is " + Math.round(score));
+                }
+            }
+        }
+        //score board
+        function TextObject(s,x,y,c){
+            this.x=x;
+            this.y=y;
+            this.string=s;
+            this.color=c;
+            this.up=function(){
+                ctx.fillStyle=this.color;
+                ctx.strokeStyle="black";
+                ctx.font="20px Georgia";
+                ctx.fillText("Score : "+this.string,x,y);
+                ctx.strokeText("Score : "+this.string,x,y);
+            }
+            this.up();
+        }
+        function object(x,y,w,h,c){
+            this.width=w;
+            this.height=h;
+            this.x=x;
+            this.y=y;
+            this.color=c;
+            this.update=function(){
+                ctx.fillStyle=this.color;
+                ctx.fillRect(this.x,this.y,this.width,this.height);
+            }
+            this.update();
+        }
+        initialize();
+    </script>
+</body>
+
+</html>
