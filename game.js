@@ -73,8 +73,23 @@ var keys;
 					this.interval=setInterval(checkOpt,150);
 					 //Sound looping during the game.
 				    BG.sound.setAttribute("loop","none");
-				    BG.play();
-					//mainArea.backgroundSrc=""; //set background for the startScreen background
+					BG.muted = true;
+				    // BG.play();
+
+
+						var promise = BG.play();
+						
+						if (promise !== undefined) {
+							promise.then(_ => {
+								// Autoplay started!
+								console.log("game started");
+							}).catch(error => {
+								// Autoplay was prevented.
+								// Show a "Play" button so that user can start playback.
+								console.log("game not started");
+							});
+						}
+						//mainArea.backgroundSrc=""; //set background for the startScreen background
 				},
 				stop:function(){
 					clearInterval(this.interval);
@@ -524,9 +539,24 @@ var keys;
                 }
             };
             intro.onloadeddata =function(){
-                    intro.play();
-                    mainArea.start();
-                    playV();
+				console.log("hi htere")
+					var promise = intro.play();
+					mainArea.start();
+					playV();
+
+					if (promise !== undefined) {
+						promise.then(_ => {
+							// Autoplay started!
+							console.log("game started");
+						}).catch(error => {
+							// Autoplay was prevented.
+							// Show a "Play" button so that user can start playback.
+								intro.muted = true;
+								intro.play()
+						});
+
+					}
+                    
             };
             
 			/* end of code please write down any bug here 
